@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copy</title>
+    <link
+      rel="stylesheet"
+      href="https://codepen.io/dannievinther/pen/af7e27ae86cdc49fbf85e54ae30c50eb.css"
+    />
+    <style>
+      *,
+      ::before,
+      ::after {
+        box-sizing: border-box;
+        transition: 0.15s cubic-bezier(0.22, 0.03, 0.26, 1);
+      }
+
+      :root {
+        --copied: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%2372f1b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10z'/%3E%3Cpath d='m9 12l2 2l4-4'/%3E%3C/g%3E%3C/svg%3E")
+          50% 50% / contain no-repeat;
+      }
+
+      body {
+        display: grid;
+        grid-template-columns: 1fr minmax(0, 60rem) 1fr;
+        gap: 3rem 1rem;
+        line-height: 1.5;
+        color: hsl(264 20% 20%);
+        margin-block: 3rem;
+        font-family: system-ui, sans-serif;
+        background: hsl(264 50% 97%);
+      }
+
+      body > * {
+        grid-column: 2;
+      }
+
+      header {
+        display: grid;
+        gap: 1rem;
+        border-radius: 8px;
+        background: #fff;
+        padding: 1rem;
+        max-inline-size: 60ch;
+        margin-inline: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.125;
+      }
+
+      h1 {
+        color: hsl(264 70% 20%);
+      }
+
+      header p {
+        color: hsl(264 50% 30%);
+      }
+
+      main {
+        display: grid;
+      }
+
+      section:nth-child(odd) {
+        border-image: conic-gradient(hsl(264 30% 94%) 0 0) fill 0/0/0 100vmax;
+        transform: skewY(-2deg);
+      }
+      section:nth-child(odd) > * {
+        transform: skewY(2deg);
+      }
+
+      section {
+        display: flex;
+        flex-flow: wrap;
+        gap: 1rem;
+        padding-block: 4rem;
+      }
+
+      h2 {
+        flex: 1 1 20ch;
+        display: inline-grid;
+        grid-template-columns: 2ch 1fr;
+        color: #5000ca;
+        font-size: 1.25rem;
+      }
+
+      h2::before {
+        content: "";
+        display: inline-block;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23a694c0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4'/%3E%3Cpath d='M14 2v6h6M9 18l3-3l-3-3m-4 0l-3 3l3 3'/%3E%3C/g%3E%3C/svg%3E")
+          0 / contain;
+        aspect-ratio: 1 / 1;
+        /* width: 1em; */
+        vertical-align: baseline;
+        margin-inline-end: 0.3ch;
+      }
+
+      article {
+        flex: 2 1 50ch;
+      }
+
+      div {
+        display: grid;
+        grid-template-columns: 2ch 1fr;
+        gap: 1rem;
+        position: relative;
+        border-radius: 8px;
+      }
+
+      textarea {
+        display: block;
+        font-size: max(1em, 16px);
+        line-height: 1.5;
+        border-radius: inherit;
+        color: #404660;
+        border-radius: 12px;
+        border: 1px solid #e1e6f9;
+        padding: 0.25rem 0.45rem 0.45rem;
+
+        resize: none;
+        cursor: copy;
+        overflow: hidden;
+      }
+
+      .copying textarea {
+        box-shadow: 0 0 0 6px #72f1b8;
+        isolation: isolate;
+      }
+
+      textarea:where(:hover:not(:focus-visible)) {
+        box-shadow: 0 0 0 2px #e1e6f9;
+      }
+
+      :focus-visible {
+        outline: 0;
+        box-shadow: 0 0 0 2px #72f1b8;
+      }
+
+      div::before {
+        content: attr(data-type);
+        font-family: Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
+        color: #000;
+        font-weight: 700;
+        padding: 1rem 0 0;
+        pointer-events: none;
+      }
+
+      .copied::after {
+        grid-column: 2;
+        position: absolute;
+        inset-block-start: 2px;
+        inset-inline-start: 2px;
+        transform: translate(-50%, -50%);
+        border-radius: 1e5px;
+        border: 1px solid #0000;
+        aspect-ratio: 1/1;
+        inline-size: 24px;
+        background: var(--copied) padding-box, #fff border-box;
+        content: "";
+        transition: 1s;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Kopier tekster til opgaven</h1>
+      <p>
+        Klik på teksten, du vil kopiere. Teksten kan du indsættes på den
+        relevante side i VS Code ved <kbd>Cmd+C</kbd> på en Mac og
+        <kbd>Ctrl+C</kbd> på Windows.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h2>index.html (Forsiden)</h2>
+        <article>
+          <div data-type="h1">
+            <textarea readonly spellcheck="false">Computere</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Et site om computeren med alt fra dens historie til dens specifikationer og mine personlige præferencer, når det gælder computere og computerudstyr.</textarea
+            >
+          </div>
+          <div data-type="a">
+            <textarea readonly spellcheck="false">Min computer</textarea>
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Computere i hjemmet</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Ni ud af ti familier ejer i 2022 en eller flere smartphones, mens knap seks ud af ti familier har en tablet-pc liggende. Hele 94 procent ejer en personlig computer, hvoraf fire ud af ti anvender Windows som deres primære operativsystem.</textarea
+            >
+          </div>
+          <div data-type="dl"></div>
+          <div data-type="dt">
+            <textarea readonly spellcheck="false">Personlig computer</textarea>
+          </div>
+          <div data-type="dd">
+            <textarea readonly spellcheck="false">94%</textarea>
+          </div>
+          <div data-type="dt">
+            <textarea readonly spellcheck="false">Windows</textarea>
+          </div>
+          <div data-type="dd">
+            <textarea readonly spellcheck="false">40%</textarea>
+          </div>
+          <div data-type="dt">
+            <textarea readonly spellcheck="false">Tablet</textarea>
+          </div>
+          <div data-type="dd">
+            <textarea readonly spellcheck="false">56%</textarea>
+          </div>
+          <div data-type="dt">
+            <textarea readonly spellcheck="false">Smartphone</textarea>
+          </div>
+          <div data-type="dd">
+            <textarea readonly spellcheck="false">93%</textarea>
+          </div>
+        </article>
+      </section>
+
+      <section>
+        <h2>min_computer.html (Side 2)</h2>
+        <article>
+          <div data-type="h1">
+            <textarea readonly spellcheck="false">Min computer</textarea>
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Type</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+[Her skal du selv skrive en kort beskrivelse af din egen computer]</textarea
+            >
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Specifikationer</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+[Her skal du selv kort beskrive og liste specifikationerne på din computer]</textarea
+            >
+          </div>
+        </article>
+      </section>
+
+      <section>
+        <h2>operativsystemer.html (Side 3)</h2>
+        <article>
+          <div data-type="h1">
+            <textarea readonly spellcheck="false">Operativsystemer</textarea>
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Mac</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Ikke alle tænker over, at 'Mac' er en forkortelse af 'Macintosh'. Operativsystemet har en historie, der begynder i 1984, hvor den personlige computer (PC) ikke var alles eje.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+I dag er sagen en anden: De fleste mennesker kan i 2022 forventes at have mindst én computer. For nogle er det en mobiltelefon, for andre en laptop og for andre igen en stationær. Og langt de fleste danskere har også mere end én computer i deres hjem.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+I skrivende stund bruger de nyste Mac computere styresystemet macOS, der er et UNIX operativsystem. Seneste version er macOS 12.5 fra d. 20. juli, 2022. Mest spændende er nok det skifte, Apple, der står bag Mac, i 2020 begyndte på, da de præsenterede Apple M1 processoren, hvor de før brugte Intel Core processorer. M1 chippen skulle være revolutionær.</textarea
+            >
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Windows</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Fra Microsoft har vi styresystemet Windows. Det er udbredt til en lang række mærker indenfor PC-markedet. Windows vs Mac kan godt opleves som lidt af en (smags-)religion, men det er først og fremmest to forskellige systemer, som hver især kræver tilpas meget at blive effektiv i at bruge. Windows 11 er nyeste skud på stammen.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+En computer med Windows er ofte billigere end én med macOS, men du kan roligt regne med, at de fleste vil foretrække enten det ene eller andet og ikke altid overveje prisen på systemet, de bliver en del af.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Der er klart flere computere, der kører på Windows i forhold til macOS. Du kan se lidt forskellig statistik på styresystemer hos f.eks. W3Schools under deres Browser Stats > Browsers OS: https://www.w3schools.com/browsers/browsers_os.asp</textarea
+            >
+          </div>
+          <div data-type="aside"></div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Tablets og mobiler</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Hvis du har en tablet eller en mobiltelefon, så har den også et styresystem. En smartphone i dag har typisk enten iOS (Apple) eller Android (mange forskellige mærker). For år tilbage kunne man også se mobiler med Windows Mobile. Men de er i dag en sjældenhed, selvom mange fandt tilgængeligheden for svagsynede bedst hos Windows.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Nogle tech-nørder afsværger Android og iOS og installerer i stedet f.eks. Linux på deres telefon. Det kan f.eks. være Ubuntu Touch. Apple har også lavet et tablet-dedikeret operativsystem, de kalder iPadOS.</textarea
+            >
+          </div>
+        </article>
+      </section>
+
+      <section>
+        <h2>komponenter.html (Side 4)</h2>
+        <article>
+          <div data-type="h1">
+            <textarea readonly spellcheck="false">Komponenter</textarea>
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Vigtige komponenter</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+CPU'en er din computers 'Central Processing Unit'. Lidt ligesom din hjerne er hos dig. Bygger du en stationær computer, vil det første, du vælger, oftest være CPU. Det skyldes, at det er afgørende for bundkort og RAM hvilken CPU, du har. I 2021 var det meget svært at skaffe en god CPU, da producenterne slet ikke kunne klare efterspørgslen. Det skyldtes både corona-logistik og "bitcoin" mining, der fik markedet til at gå næsten i stå.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+GPU kan du måske regne ud, hvad står for? Nemlig, 'Graphic Processing Unit'. Eller på dansk: Grafikkort. Hvis du skal spille computerspil eller redigere video, kan det være en rigtigt god idé at købe en computer med et selvstændigt grafikkort med egne dedikerede RAM. Det er store kræfter, der kræves, når grafik skal spille 100%.</textarea
+            >
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+RAM, som vi nævnte kort under GPU, er hukommelse for computeren. Altså, hvor mange mellemregninger, den kan have i hovedet på samme tid. Hvis det giver mening. RAM er en forkortelse for 'Random Access Memory'.</textarea
+            >
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Køling</textarea>
+          </div>
+          <div data-type="h3">
+            <textarea readonly spellcheck="false">Luftkøling</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Den mest almindelige måde at køle en computer på, er luftkøling. Der sidder ganske enkelt én eller flere ventilatorer i computeren, som leder den varme luft væk og køligere luft ind. De kan larme noget så frygteligt, men i dag kan man også købe luftkølere, der næsten intet siger og alligevel løser opgaven at køle CPU og resten af computeren.</textarea
+            >
+          </div>
+          <div data-type="h3">
+            <textarea readonly spellcheck="false">Vandkøling</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Skal din køling være fancy og futuristisk, er vandkøling måske et kig værd. Det handler helt kort om at bruge vand (i et lukket system) til at holde temperaturen i din computer på et fornuftigt niveau. Når det kan være fancy og futuristisk, så skyldes det selvfølgelig, at det kræver pumper, rør og andet udstyr at få væsken rundt.</textarea
+            >
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Motherboard</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Bundkortet er "pladen", du sætter din CPU, din GPU og dine RAM fast i. Det er på den måde ret afgørende, at dit motherboard dvs. dit bundkort passer til resten af din hardware. Ellers bliver det en "flaskehals".</textarea
+            >
+          </div>
+        </article>
+      </section>
+
+      <section>
+        <h2>galleri.html (Side 5)</h2>
+        <article>
+          <div data-type="h1">
+            <textarea readonly spellcheck="false">Galleri</textarea>
+          </div>
+          <div data-type="h2">
+            <textarea readonly spellcheck="false">Udseende</textarea>
+          </div>
+          <div data-type="p">
+            <textarea readonly spellcheck="false">
+Det er ret vildt, hvor forskellige, og nogle gange hvor ens, computere ser ud. Her kan du se nogle eksempler på, hvordan computere ser ud. Bemærk forskelle og ligheder på de forskellige billeder.</textarea
+            >
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const textArea = document.querySelectorAll("textarea");
+      const sections = document.querySelectorAll("section");
+
+      const copyToClipboardAsync = (str) => {
+        if (navigator && navigator.clipboard && navigator.clipboard.writeText)
+          return navigator.clipboard.writeText(str);
+        return Promise.reject("The Clipboard API is not available.");
+      };
+
+      textArea.forEach((el) => {
+        const text = el.value;
+        el.style.height = el.setAttribute(
+          "style",
+          "height: " + el.scrollHeight + "px"
+        );
+        el.classList.add("auto");
+        el.addEventListener("input", (e) => {
+          el.style.height = "auto";
+          el.style.height = el.scrollHeight + "px";
+        });
+        const parent = el.parentElement;
+        if (!text) return;
+        el.addEventListener("click", ({ target }) => {
+          copyToClipboardAsync(text);
+          parent.classList.add("copying");
+          setTimeout(() => {
+            parent.classList.remove("copying");
+            parent.classList.add("copied");
+          }, "500");
+        });
+      });
+    </script>
+  </body>
+</html>
