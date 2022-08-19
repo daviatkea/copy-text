@@ -88,6 +88,13 @@
         grid-template-columns: 2ch 1fr;
         color: #5000ca;
         font-size: 1.25rem;
+        align-content: start;
+      }
+
+      h2 span {
+        font-size: 80%;
+        font-weight: 500;
+        color: hsl(264deg 20% 37%);
       }
 
       h2::before {
@@ -96,8 +103,7 @@
         background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23a694c0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4'/%3E%3Cpath d='M14 2v6h6M9 18l3-3l-3-3m-4 0l-3 3l3 3'/%3E%3C/g%3E%3C/svg%3E")
           0 / contain;
         aspect-ratio: 1 / 1;
-        /* width: 1em; */
-        vertical-align: baseline;
+        grid-row: span 2;
         margin-inline-end: 0.3ch;
       }
 
@@ -174,14 +180,16 @@
       <h1>Kopier tekster til opgaven</h1>
       <p>
         Klik på teksten, du vil kopiere. Teksten kan du indsættes på den
-        relevante side i VS Code ved <kbd>Cmd+C</kbd> på en Mac og
-        <kbd>Ctrl+C</kbd> på Windows.
+        relevante side i VS Code ved <kbd>Cmd+V</kbd> på en Mac og
+        <kbd>Ctrl+V</kbd> på Windows.
       </p>
     </header>
 
     <main>
       <section>
-        <h2>index.html (Forsiden)</h2>
+        <h2>index.html
+          <span>Forside</span>
+        </h2>
         <article>
           <div data-type="h1">
             <textarea readonly spellcheck="false">Computere</textarea>
